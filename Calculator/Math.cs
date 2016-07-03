@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Calculator
 {
@@ -22,14 +23,27 @@ namespace Calculator
 
         public Therm(string therm)
         {
-            //prozent wird unsicher ersetzt
-            therm = therm.Replace("%", "/100").Replace("π", System.Math.PI.ToString()).Replace("e", System.Math.E.ToString());
-            this.therm = therm;
-            SplitTherm();
-            Calculate();
+            try
+            {
+                //prozent wird unsicher ersetzt
+                therm = therm.Replace("%", "/100").Replace("π", System.Math.PI.ToString()).Replace("e", System.Math.E.ToString());
+                this.therm = therm;
+                SplitTherm();
+                Calculate();
+            }
+            catch
+            {
+                Console.Open();
+                System.Console.WriteLine("unkown error");
+            }
         }
 
-        public ulong Fakultät(ulong n)
+        int PositionOfCharInFrontOfIndex(char c, int pos)
+        {
+            return 1;
+        }
+
+        ulong Fakultät(ulong n)
         {
             ulong result = 1;
             for (ulong i = 1; i <= n; i++)
@@ -65,40 +79,48 @@ namespace Calculator
 
         string FakultätBerechnen(string stringtherm)
         {
-            while(stringtherm.Contains("!"))
+            try
             {
-                int i = stringtherm.IndexOf("!");
-                string s = stringtherm.Remove(i);
-                s = ReverseString(s);
-                List<int> pos = new List<int>();
-                if (s.Contains("+"))
-                    pos.Add(s.IndexOf("+"));
-                else if (s.Contains("-"))
-                    pos.Add(s.IndexOf("-"));
-                else if (s.Contains("*"))
-                    pos.Add(s.IndexOf("*"));
-                else if (s.Contains("/"))
-                    pos.Add(s.IndexOf("/"));
-                string smallTherm = "";
-                if (pos.Count == 0)
+                while (stringtherm.Contains("!"))
                 {
-                    smallTherm = ReverseString(s);
-                    ulong fakultät = Fakultät((ulong)(new Therm(smallTherm).GetErgebnis()));
-                    stringtherm = stringtherm.Remove(0, i + 1);
-                    stringtherm = stringtherm.Insert(0, fakultät.ToString());
+                    int i = stringtherm.IndexOf("!");
+                    string s = stringtherm.Remove(i);
+                    s = ReverseString(s);
+                    List<int> pos = new List<int>();
+                    if (s.Contains("+"))
+                        pos.Add(s.IndexOf("+"));
+                    else if (s.Contains("-"))
+                        pos.Add(s.IndexOf("-"));
+                    else if (s.Contains("*"))
+                        pos.Add(s.IndexOf("*"));
+                    else if (s.Contains("/"))
+                        pos.Add(s.IndexOf("/"));
+                    string smallTherm = "";
+                    if (pos.Count == 0)
+                    {
+                        smallTherm = ReverseString(s);
+                        ulong fakultät = Fakultät((ulong)(new Therm(smallTherm).GetErgebnis()));
+                        stringtherm = stringtherm.Remove(0, i + 1);
+                        stringtherm = stringtherm.Insert(0, fakultät.ToString());
+                    }
+                    else
+                    {
+                        int smallest = int.MaxValue;
+                        foreach (int p in pos)
+                            smallest = System.Math.Min(smallest, p);
+                        smallTherm = ReverseString(s.Remove(smallest));
+                        ulong fakultät = Fakultät((ulong)(new Therm(smallTherm).GetErgebnis()));
+                        stringtherm = stringtherm.Remove(smallest + 1, i - smallest);
+                        stringtherm = stringtherm.Insert(smallest + 1, fakultät.ToString());
+                    }
                 }
-                else
-                {
-                    int smallest = int.MaxValue;
-                    foreach (int p in pos)
-                        smallest = System.Math.Min(smallest, p);
-                    smallTherm = ReverseString(s.Remove(smallest));
-                    ulong fakultät = Fakultät((ulong)(new Therm(smallTherm).GetErgebnis()));
-                    stringtherm = stringtherm.Remove(smallest + 1, i - smallest);
-                    stringtherm = stringtherm.Insert(smallest + 1, fakultät.ToString());
-                }
+                return stringtherm;
             }
-            return stringtherm;
+            catch
+            {
+                Console.Open();
+                System.Console.WriteLine("error in fakultät RAUSRECHNUNG");
+            }
         }
 
         void SplitTherm()
@@ -207,6 +229,20 @@ namespace Calculator
             char[] charArray = s.ToCharArray();
             Array.Reverse(charArray);
             return new string(charArray);
+        }
+    }
+
+    static class Console
+    {
+        [DllImport("Kernel32")]
+        public static extern void AllocConsole();
+
+        [DllImport("Kernel32")]
+        public static extern void FreeConsole();
+
+        public static void Open()
+        {
+            AllocConsole();
         }
     }
 }
