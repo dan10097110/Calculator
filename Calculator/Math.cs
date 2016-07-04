@@ -9,67 +9,40 @@ namespace Calculator
     {
         public static double Calculate(string therm)
         {
-            return new Therm(therm).GetErgebnis();
+            return new Therm(therm).GetResult();
+        }
+
+        public static ulong Factorial(ulong n)
+        {
+            if (n % 1 == 0)
+            {
+                ulong result = 1;
+                for (ulong i = 1; i <= n; i++)
+                {
+                    result *= i;
+                }
+                return result;
+            }
+            else
+                return 0;
         }
     }
 
     class Therm
     {
         string therm;
-        Therm first, second;
-        byte rechenart = 0;
-        List<string> klammerContent = new List<string>();
-        double ergebnis;
+        double result;
 
         public Therm(string therm)
         {
-            try
-            {
-                //prozent wird unsicher ersetzt
-                therm = therm.Replace("%", "/100").Replace("π", System.Math.PI.ToString()).Replace("e", System.Math.E.ToString());
-                this.therm = therm;
-                SplitTherm();
-                Calculate();
-            }
-            catch
-            {
-                Console.Open();
-                System.Console.WriteLine("unkown error");
-            }
+            //prozent wird unsicher ersetzt
+            this.therm = therm.Replace("%", "/100").Replace("π", System.Math.PI.ToString()).Replace("e", System.Math.E.ToString());
+            Calculate();
         }
 
-        int PositionOfCharInFrontOfIndex(char c, int pos)
+        public double GetResult()
         {
-            return 1;
-        }
-
-        ulong Fakultät(ulong n)
-        {
-            ulong result = 1;
-            for (ulong i = 1; i <= n; i++)
-            {
-                result *= i;
-            }
             return result;
-        }
-
-        public double GetErgebnis()
-        {
-            return ergebnis;
-        }
-
-        void Calculate()
-        {
-            switch (rechenart)
-            {
-                case 1: ergebnis = first.GetErgebnis() + second.GetErgebnis(); break;
-                case 2: ergebnis = first.GetErgebnis() - second.GetErgebnis(); break;
-                case 3: ergebnis = first.GetErgebnis() * second.GetErgebnis(); break;
-                case 4: ergebnis = first.GetErgebnis() / second.GetErgebnis(); break;
-                case 5: ergebnis = System.Math.Pow(first.GetErgebnis(), second.GetErgebnis()); break;
-                case 6: ergebnis = System.Math.Pow(second.GetErgebnis(), 1 / first.GetErgebnis()); break;
-                default: ergebnis = Convert.ToDouble(therm); break;
-            }
         }
 
         bool AInfrontOfB(string s, string a, string b)
@@ -77,149 +50,74 @@ namespace Calculator
             return s.Contains(a) && (s.IndexOf(a) < s.IndexOf(b) || !s.Contains(b));
         }
 
-        string FakultätBerechnen(string stringtherm)
+        void Calculate()
         {
-            try
-            {
-                while (stringtherm.Contains("!"))
-                {
-                    int i = stringtherm.IndexOf("!");
-                    string s = stringtherm.Remove(i);
-                    s = ReverseString(s);
-                    List<int> pos = new List<int>();
-                    if (s.Contains("+"))
-                        pos.Add(s.IndexOf("+"));
-                    else if (s.Contains("-"))
-                        pos.Add(s.IndexOf("-"));
-                    else if (s.Contains("*"))
-                        pos.Add(s.IndexOf("*"));
-                    else if (s.Contains("/"))
-                        pos.Add(s.IndexOf("/"));
-                    string smallTherm = "";
-                    if (pos.Count == 0)
-                    {
-                        smallTherm = ReverseString(s);
-                        ulong fakultät = Fakultät((ulong)(new Therm(smallTherm).GetErgebnis()));
-                        stringtherm = stringtherm.Remove(0, i + 1);
-                        stringtherm = stringtherm.Insert(0, fakultät.ToString());
-                    }
-                    else
-                    {
-                        int smallest = int.MaxValue;
-                        foreach (int p in pos)
-                            smallest = System.Math.Min(smallest, p);
-                        smallTherm = ReverseString(s.Remove(smallest));
-                        ulong fakultät = Fakultät((ulong)(new Therm(smallTherm).GetErgebnis()));
-                        stringtherm = stringtherm.Remove(smallest + 1, i - smallest);
-                        stringtherm = stringtherm.Insert(smallest + 1, fakultät.ToString());
-                    }
-                }
-                return stringtherm;
-            }
-            catch
-            {
-                Console.Open();
-                System.Console.WriteLine("error in fakultät RAUSRECHNUNG");
-            }
-        }
-
-        void SplitTherm()
-        {
-            string rTherm = ReverseString(ReplaceKlammern(therm));
-            rTherm = ReverseString(FakultätBerechnen(ReverseString(rTherm)));
-            therm = ReverseString(ReplaceKlammern(InsertContent(rTherm)));
+            string reversedTherm = ReverseString(CalculateBrackets(therm));
             for (;;)
             {
-                if (rTherm != "c")
+                ushort index = 0;
+                if (AInfrontOfB(reversedTherm, "+", "-"))
                 {
-                    byte pos = 0;
-                    if (AInfrontOfB(rTherm, "+", "-"))
-                    {
-                        rechenart = 1;
-                        pos = (byte)rTherm.IndexOf('+');
-                    }
-                    else if (rTherm.Contains('-'))
-                    {
-                        rechenart = 2;
-                        pos = (byte)rTherm.IndexOf('-');
-                    }
-                    else if (AInfrontOfB(rTherm, "*", "/"))
-                    {
-                        rechenart = 3;
-                        pos = (byte)rTherm.IndexOf('*');
-                    }
-                    else if (rTherm.Contains('/'))
-                    {
-                        rechenart = 4;
-                        pos = (byte)rTherm.IndexOf('/');
-                    }
-                    else if (AInfrontOfB(rTherm, "^", "√"))
-                    {
-                        rechenart = 5;
-                        pos = (byte)rTherm.IndexOf('^');
-                    }
-                    else if(rTherm.Contains('√'))
-                    {
-                        rechenart = 6;
-                        pos = (byte)rTherm.IndexOf('√');
-                    }
-                    if(rechenart != 0)
-                    {
-                        first = new Therm(InsertContent(ReverseString(rTherm.Substring(pos + 1))));
-                        second = new Therm(InsertContent(ReverseString(rTherm.Remove(pos))));
-                    }
-                    break;
+                    index = (ushort)reversedTherm.IndexOf('+');
+                    result = new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult() + new Therm(ReverseString(reversedTherm.Remove(index))).GetResult();
                 }
+                else if (reversedTherm.Contains('-'))
+                {
+                    index = (ushort)reversedTherm.IndexOf('-');
+                    result = new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult() - new Therm(ReverseString(reversedTherm.Remove(index))).GetResult();
+                }
+                else if (AInfrontOfB(reversedTherm, "*", "/"))
+                {
+                    index = (ushort)reversedTherm.IndexOf('*');
+                    result = new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult() * new Therm(ReverseString(reversedTherm.Remove(index))).GetResult();
+                }
+                else if (reversedTherm.Contains('/'))
+                {
+                    index = (ushort)reversedTherm.IndexOf('/');
+                    result = new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult() / new Therm(ReverseString(reversedTherm.Remove(index))).GetResult();
+                }
+                else if (AInfrontOfB(reversedTherm, "^", "√"))
+                {
+                    index = (ushort)reversedTherm.IndexOf('^');
+                    result = System.Math.Pow(new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult(), new Therm(ReverseString(reversedTherm.Remove(index))).GetResult());
+                }
+                else if (reversedTherm.Contains('√'))
+                {
+                    index = (ushort)reversedTherm.IndexOf('√');
+                    result = System.Math.Pow(new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult(), 1 / new Therm(ReverseString(reversedTherm.Remove(index))).GetResult());
+                }
+                else if (reversedTherm.Contains('!'))
+                    Math.Factorial((ulong)new Therm(ReverseString(reversedTherm.Substring(reversedTherm.IndexOf('!') + 1))).GetResult());
                 else
-                {
-                    rTherm = InsertContent(rTherm);
-                    rTherm = rTherm.Remove(0, 1);
-                    rTherm = rTherm.Remove(rTherm.Length - 1, 1);
-                    therm = ReverseString(ReplaceKlammern(rTherm));
-                }
+                    result = Convert.ToDouble(therm);
+                break;
             }
         }
 
-        string ReplaceKlammern(string s)
+        string CalculateBrackets(string therm)
         {
-            while (s.Contains('(') || s.Contains(')'))
+            while (therm.Contains('(') || therm.Contains(')'))
             {
-                byte i = 0, posKlammerAuf = 0, posKlammerZu = 0;
+                ushort i = 0, openBracketIndex = 0, closedBracketIndex = 0;
                 do
                 {
-                    if (AInfrontOfB(s, "(", ")"))
+                    if (AInfrontOfB(therm, "(", ")"))
                     {
-                        byte posA = (byte)s.IndexOf('(');
-                        s = s.Remove(posA, 1);
-                        s = s.Insert(posA, "a");
-                        if (i == 0) posKlammerAuf = posA;
-                        i++;
+                        ushort posA = (ushort)therm.IndexOf('(');
+                        therm = therm.Remove(posA, 1).Insert(posA, "o");
+                        if (i++ == 0)
+                            openBracketIndex = posA;
                     }
-                    else
+                    else if(therm.Contains(")"))
                     {
-                        byte posZ = (byte)s.IndexOf(')');
-                        s = s.Remove(posZ, 1);
-                        s = s.Insert(posZ, "z");
-                        i--;
-                        if (i == 0) posKlammerZu = posZ;
+                        ushort posZ = (ushort)therm.IndexOf(')');
+                        therm = therm.Remove(posZ, 1).Insert(posZ, "c");
+                        if (--i == 0)
+                            closedBracketIndex = posZ;
                     }
                 } while (i != 0);
-                s = s.Replace('a', '(').Replace('z', ')');
-                klammerContent.Add(s.Substring(posKlammerAuf, posKlammerZu - posKlammerAuf + 1));
-                s = s.Remove(posKlammerAuf, posKlammerZu - posKlammerAuf + 1);
-                s = s.Insert(posKlammerAuf, "c");
-            }
-            return s;
-        }
-
-        string InsertContent(string therm)
-        {
-            while (therm.Contains('c'))
-            {
-                byte pos = (byte)therm.IndexOf('c');
-                therm = therm.Remove(pos, 1);
-                therm = therm.Insert(pos, klammerContent.First());
-                klammerContent.Remove(klammerContent.First());
+                therm = therm.Replace('o', '(').Replace('c', ')');
+                therm = therm.Remove(openBracketIndex, closedBracketIndex - openBracketIndex + 1).Insert(openBracketIndex, new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult().ToString());
             }
             return therm;
         }
