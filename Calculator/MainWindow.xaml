@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Calculator" Height="257" Width="432" ResizeMode="NoResize">
     <Grid>
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="395" FontSize="18" Height="26"/>
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="395" FontSize="18" Height="26" Text="log zur basis x"/>
         <TextBox x:Name="textBox1" HorizontalAlignment="Left" Margin="10,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="395" FontSize="18" IsReadOnly="True" Height="26"/>
         <Button x:Name="buttonSieben" Content="7" HorizontalAlignment="Left" Margin="160,72,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonSieben_Click"/>
         <Button x:Name="buttonFakultät" Content="x!" HorizontalAlignment="Left" Margin="60,107,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonFakultät_Click"/>
@@ -38,8 +38,8 @@
         <Button x:Name="buttonE" Content="e" HorizontalAlignment="Left" Margin="110,177,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonE_Click"/>
         <Button x:Name="buttonProzent" Content="%" HorizontalAlignment="Left" Margin="110,107,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonProzent_Click"/>
         <Button x:Name="buttonLastAnswer" Content="Ans" HorizontalAlignment="Left" Margin="10,177,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonLastAnswer_Click"/>
-        <Button x:Name="buttonTangens" Content="tan" HorizontalAlignment="Left" Margin="10,107,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonTangens_Click"/>
-        <Button x:Name="buttonCosinus" Content="cos" HorizontalAlignment="Left" Margin="10,142,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonCosinus_Click"/>
+        <Button x:Name="buttonTangens" Content="tan" HorizontalAlignment="Left" Margin="10,142,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonTangens_Click"/>
+        <Button x:Name="buttonCosinus" Content="cos" HorizontalAlignment="Left" Margin="10,107,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonCosinus_Click"/>
         <Button x:Name="buttonSinus" Content="sin" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonSinus_Click"/>
 
     </Grid>

@@ -14,17 +14,12 @@ namespace Calculator
 
         public static ulong Factorial(ulong n)
         {
-            if (n % 1 == 0)
+            ulong result = 1;
+            for (ulong i = 1; i <= n; i++)
             {
-                ulong result = 1;
-                for (ulong i = 1; i <= n; i++)
-                {
-                    result *= i;
-                }
-                return result;
+                result *= i;
             }
-            else
-                return 0;
+            return result;
         }
     }
 
@@ -53,37 +48,19 @@ namespace Calculator
         void Calculate()
         {
             string reversedTherm = ReverseString(CalculateBrackets(therm));
-            ushort index = 0;
-            if (AInfrontOfB(reversedTherm, "+", "-"))
-            {
-                index = (ushort)reversedTherm.IndexOf('+');
+            int index = 0;
+            if ((index = reversedTherm.IndexOf('+')) != -1 && AInfrontOfB(reversedTherm, "+", "-"))
                 result = new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult() + new Therm(ReverseString(reversedTherm.Remove(index))).GetResult();
-            }
-            else if (reversedTherm.Contains('-'))
-            {
-                index = (ushort)reversedTherm.IndexOf('-');
+            else if ((index = reversedTherm.IndexOf('-')) != -1)
                 result = new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult() - new Therm(ReverseString(reversedTherm.Remove(index))).GetResult();
-            }
-            else if (AInfrontOfB(reversedTherm, "*", "/"))
-            {
-                index = (ushort)reversedTherm.IndexOf('*');
+            else if ((index = reversedTherm.IndexOf('*')) != -1 && AInfrontOfB(reversedTherm, "*", "/"))
                 result = new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult() * new Therm(ReverseString(reversedTherm.Remove(index))).GetResult();
-            }
-            else if (reversedTherm.Contains('/'))
-            {
-                index = (ushort)reversedTherm.IndexOf('/');
+            else if ((index = reversedTherm.IndexOf('/')) != -1)
                 result = new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult() / new Therm(ReverseString(reversedTherm.Remove(index))).GetResult();
-            }
-            else if (AInfrontOfB(reversedTherm, "^", "√"))
-            {
-                index = (ushort)reversedTherm.IndexOf('^');
+            else if ((index = reversedTherm.IndexOf('^')) != -1 && AInfrontOfB(reversedTherm, "^", "√"))
                 result = System.Math.Pow(new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult(), new Therm(ReverseString(reversedTherm.Remove(index))).GetResult());
-            }
-            else if (reversedTherm.Contains('√'))
-            {
-                index = (ushort)reversedTherm.IndexOf('√');
+            else if ((index = reversedTherm.IndexOf('√')) != -1)
                 result = System.Math.Pow(new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult(), 1 / new Therm(ReverseString(reversedTherm.Remove(index))).GetResult());
-            }
             else if (reversedTherm.Contains('!'))
                 result = Math.Factorial((ulong)new Therm(ReverseString(reversedTherm.Substring(reversedTherm.IndexOf('!') + 1))).GetResult());
             else
@@ -100,7 +77,7 @@ namespace Calculator
                     if (AInfrontOfB(therm, "(", ")"))
                     {
                         ushort pos1 = (ushort)therm.IndexOf('(');
-                        therm = therm.Remove(pos1, 1).Insert(pos1, "o");
+                        therm = therm.Remove(pos1, 1).Insert(pos1, "p");
                         if (i++ == 0)
                             openBracketIndex = pos1;
                     }
@@ -112,8 +89,37 @@ namespace Calculator
                             closedBracketIndex = pos2;
                     }
                 } while (i != 0);
-                therm = therm.Replace('o', '(').Replace('c', ')');
-                therm = therm.Remove(openBracketIndex, closedBracketIndex - openBracketIndex + 1).Insert(openBracketIndex, new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult().ToString());
+                therm = therm.Remove(openBracketIndex, 1).Insert(openBracketIndex, "(");
+                if (therm.Contains("sin("))
+                {
+                    therm = therm.Replace('p', '(').Replace('c', ')');
+                    therm = therm.Remove(openBracketIndex - 3, closedBracketIndex - openBracketIndex + 4).Insert(openBracketIndex - 3, System.Math.Sin(System.Math.PI * new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult() / 180.0).ToString());
+                }
+                else if (therm.Contains("cos("))
+                {
+                    therm = therm.Replace('p', '(').Replace('c', ')');
+                    therm = therm.Remove(openBracketIndex - 3, closedBracketIndex - openBracketIndex + 4).Insert(openBracketIndex - 3, System.Math.Cos(System.Math.PI * new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult() / 180.0).ToString());
+                }
+                else if (therm.Contains("tan("))
+                {
+                    therm = therm.Replace('p', '(').Replace('c', ')');
+                    therm = therm.Remove(openBracketIndex - 3, closedBracketIndex - openBracketIndex + 4).Insert(openBracketIndex - 3, System.Math.Tan(System.Math.PI * new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult() / 180.0).ToString());
+                }
+                else if (therm.Contains("log("))
+                {
+                    therm = therm.Replace('p', '(').Replace('c', ')');
+                    therm = therm.Remove(openBracketIndex - 3, closedBracketIndex - openBracketIndex + 4).Insert(openBracketIndex - 3, System.Math.Log10(new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult()).ToString());
+                }
+                else if (therm.Contains("ln("))
+                {
+                    therm = therm.Replace('p', '(').Replace('c', ')');
+                    therm = therm.Remove(openBracketIndex - 2, closedBracketIndex - openBracketIndex + 3).Insert(openBracketIndex - 2, System.Math.Log(new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult()).ToString());
+                }
+                else
+                {
+                    therm = therm.Replace('p', '(').Replace('c', ')');
+                    therm = therm.Remove(openBracketIndex, closedBracketIndex - openBracketIndex + 1).Insert(openBracketIndex, new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult().ToString());
+                }
             }
             return therm;
         }

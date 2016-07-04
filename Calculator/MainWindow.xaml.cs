@@ -46,17 +46,17 @@ namespace Calculator
 
         private void buttonSinus_Click(object sender, RoutedEventArgs e)
         {
-            Write("sin(°)", 4);
+            Write("sin()", 4);
         }
 
         private void buttonTangens_Click(object sender, RoutedEventArgs e)
         {
-            Write("tan(°)", 4);
+            Write("tan()", 4);
         }
 
         private void buttonCosinus_Click(object sender, RoutedEventArgs e)
         {
-            Write("cos(°)", 4);
+            Write("cos()", 4);
         }
 
         private void buttonLastAnswer_Click(object sender, RoutedEventArgs e)
