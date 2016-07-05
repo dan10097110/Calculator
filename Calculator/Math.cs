@@ -30,9 +30,8 @@ namespace Calculator
 
         public Therm(string therm)
         {
-            //prozent wird unsicher ersetzt
-            this.therm = therm.Replace("%", "/100").Replace("π", System.Math.PI.ToString()).Replace("e", System.Math.E.ToString());
-            Calculate();
+            this.therm = strTools.ReplaceAll(therm, "%", "/100", "π", System.Math.PI.ToString(), "e", System.Math.E.ToString());
+            CalculateOperator();
         }
 
         public double GetResult()
@@ -45,29 +44,29 @@ namespace Calculator
             return s.Contains(a) && (s.IndexOf(a) < s.IndexOf(b) || !s.Contains(b));
         }
 
-        void Calculate()
+        void CalculateOperator()
         {
-            string reversedTherm = ReverseString(CalculateBrackets(therm));
+            string reversedTherm = strTools.Reverse(CalculateFunctions(therm));
             int index = 0;
             if ((index = reversedTherm.IndexOf('+')) != -1 && AInfrontOfB(reversedTherm, "+", "-"))
-                result = new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult() + new Therm(ReverseString(reversedTherm.Remove(index))).GetResult();
+                result = new Therm(strTools.Reverse(reversedTherm.Substring(index + 1))).GetResult() + new Therm(strTools.Reverse(reversedTherm.Remove(index))).GetResult();
             else if ((index = reversedTherm.IndexOf('-')) != -1)
-                result = new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult() - new Therm(ReverseString(reversedTherm.Remove(index))).GetResult();
+                result = new Therm(strTools.Reverse(reversedTherm.Substring(index + 1))).GetResult() - new Therm(strTools.Reverse(reversedTherm.Remove(index))).GetResult();
             else if ((index = reversedTherm.IndexOf('*')) != -1 && AInfrontOfB(reversedTherm, "*", "/"))
-                result = new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult() * new Therm(ReverseString(reversedTherm.Remove(index))).GetResult();
+                result = new Therm(strTools.Reverse(reversedTherm.Substring(index + 1))).GetResult() * new Therm(strTools.Reverse(reversedTherm.Remove(index))).GetResult();
             else if ((index = reversedTherm.IndexOf('/')) != -1)
-                result = new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult() / new Therm(ReverseString(reversedTherm.Remove(index))).GetResult();
+                result = new Therm(strTools.Reverse(reversedTherm.Substring(index + 1))).GetResult() / new Therm(strTools.Reverse(reversedTherm.Remove(index))).GetResult();
             else if ((index = reversedTherm.IndexOf('^')) != -1 && AInfrontOfB(reversedTherm, "^", "√"))
-                result = System.Math.Pow(new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult(), new Therm(ReverseString(reversedTherm.Remove(index))).GetResult());
+                result = System.Math.Pow(new Therm(strTools.Reverse(reversedTherm.Substring(index + 1))).GetResult(), new Therm(strTools.Reverse(reversedTherm.Remove(index))).GetResult());
             else if ((index = reversedTherm.IndexOf('√')) != -1)
-                result = System.Math.Pow(new Therm(ReverseString(reversedTherm.Substring(index + 1))).GetResult(), 1 / new Therm(ReverseString(reversedTherm.Remove(index))).GetResult());
+                result = System.Math.Pow(new Therm(strTools.Reverse(reversedTherm.Substring(index + 1))).GetResult(), 1 / new Therm(strTools.Reverse(reversedTherm.Remove(index))).GetResult());
             else if (reversedTherm.Contains('!'))
-                result = Math.Factorial((ulong)new Therm(ReverseString(reversedTherm.Substring(reversedTherm.IndexOf('!') + 1))).GetResult());
+                result = Math.Factorial((ulong)new Therm(strTools.Reverse(reversedTherm.Substring(reversedTherm.IndexOf('!') + 1))).GetResult());
             else
-                result = Convert.ToDouble(ReverseString(reversedTherm));
+                result = Convert.ToDouble(strTools.Reverse(reversedTherm));
         }
 
-        string CalculateBrackets(string therm)
+        string CalculateFunctions(string therm)
         {
             while (therm.Contains('('))
             {
@@ -77,54 +76,69 @@ namespace Calculator
                     if (AInfrontOfB(therm, "(", ")"))
                     {
                         ushort pos1 = (ushort)therm.IndexOf('(');
-                        therm = therm.Remove(pos1, 1).Insert(pos1, "p");
+                        therm = therm.Remove(pos1, 1).Insert(pos1, "[");
                         if (i++ == 0)
                             openBracketIndex = pos1;
                     }
                     else if(therm.Contains(")"))
                     {
                         ushort pos2 = (ushort)therm.IndexOf(')');
-                        therm = therm.Remove(pos2, 1).Insert(pos2, "c");
+                        therm = therm.Remove(pos2, 1).Insert(pos2, "]");
                         if (--i == 0)
                             closedBracketIndex = pos2;
                     }
                 } while (i != 0);
-                therm = therm.Remove(openBracketIndex, 1).Insert(openBracketIndex, "(");
-                if (therm.Contains("sin("))
-                {
-                    therm = therm.Replace('p', '(').Replace('c', ')');
-                    therm = therm.Remove(openBracketIndex - 3, closedBracketIndex - openBracketIndex + 4).Insert(openBracketIndex - 3, System.Math.Sin(System.Math.PI * new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult() / 180.0).ToString());
-                }
-                else if (therm.Contains("cos("))
-                {
-                    therm = therm.Replace('p', '(').Replace('c', ')');
-                    therm = therm.Remove(openBracketIndex - 3, closedBracketIndex - openBracketIndex + 4).Insert(openBracketIndex - 3, System.Math.Cos(System.Math.PI * new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult() / 180.0).ToString());
-                }
-                else if (therm.Contains("tan("))
-                {
-                    therm = therm.Replace('p', '(').Replace('c', ')');
-                    therm = therm.Remove(openBracketIndex - 3, closedBracketIndex - openBracketIndex + 4).Insert(openBracketIndex - 3, System.Math.Tan(System.Math.PI * new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult() / 180.0).ToString());
-                }
-                else if (therm.Contains("log("))
-                {
-                    therm = therm.Replace('p', '(').Replace('c', ')');
-                    therm = therm.Remove(openBracketIndex - 3, closedBracketIndex - openBracketIndex + 4).Insert(openBracketIndex - 3, System.Math.Log10(new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult()).ToString());
-                }
-                else if (therm.Contains("ln("))
-                {
-                    therm = therm.Replace('p', '(').Replace('c', ')');
-                    therm = therm.Remove(openBracketIndex - 2, closedBracketIndex - openBracketIndex + 3).Insert(openBracketIndex - 2, System.Math.Log(new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult()).ToString());
-                }
+                double bracketResult = new Therm(strTools.Section(therm = strTools.ReplaceAll(therm, "[", "(", "]", ")"), openBracketIndex + 1, closedBracketIndex - 1)).GetResult();
+                therm = strTools.Replace(therm, openBracketIndex, "[");
+                if (therm.Contains("sin["))
+                    therm = strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Sin(System.Math.PI * bracketResult / 180.0).ToString());
+                else if (therm.Contains("cos["))
+                    therm = strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Cos(System.Math.PI * bracketResult / 180.0).ToString());
+                else if (therm.Contains("tan["))
+                    therm = strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Tan(System.Math.PI * bracketResult / 180.0).ToString());
+                else if (therm.Contains("log["))
+                    therm = strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Log10(bracketResult).ToString());
+                else if (therm.Contains("ln["))
+                    therm = strTools.Replace(therm, openBracketIndex - 2, closedBracketIndex, System.Math.Log(bracketResult).ToString());
                 else
-                {
-                    therm = therm.Replace('p', '(').Replace('c', ')');
-                    therm = therm.Remove(openBracketIndex, closedBracketIndex - openBracketIndex + 1).Insert(openBracketIndex, new Therm(therm.Substring(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1)).GetResult().ToString());
-                }
+                    therm = strTools.Replace(therm, openBracketIndex, closedBracketIndex, bracketResult.ToString());
             }
             return therm;
         }
+    }
 
-        string ReverseString(string s)
+    static class strTools
+    {
+        public static string Replace(string s, int index, string item)
+        {
+            return s.Remove(index, 1).Insert(index, item);
+        }
+
+        public static string Replace(string s, int startIndex, int endIndex, string item)
+        {
+            return s.Remove(startIndex, endIndex - startIndex + 1).Insert(startIndex, item);
+        }
+
+        public static string ReplaceAll(string s, params string[] items)
+        {
+            for (int i = 0; i < items.Length; i += 2)
+            {
+                s = s.Replace(items[i], items[i + 1]);
+            }
+            return s;
+        }
+
+        public static string RemoveSection(string s, int startIndex, int endIndex)
+        {
+            return s.Remove(startIndex, endIndex - startIndex + 1);
+        }
+
+        public static string Section(string s, int startIndex, int endIndex)
+        {
+            return s.Substring(startIndex, endIndex - startIndex + 1);
+        }
+
+        public static string Reverse(string s)
         {
             char[] charArray = s.ToCharArray();
             Array.Reverse(charArray);
