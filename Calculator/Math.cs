@@ -7,183 +7,175 @@ namespace Calculator
 {
     static class Math
     {
-        /*
-            x^-y -> buggy
-
-            -> x^0-y
-            -> 1-y
-
-            -> wrong result
+        //fakultät und prozent im direkten zusammenspiel funktionieren nicht
 
 
-        */
-
-            /*
-             ++
-             --
-             +-
-             -+
-
-
-
-            *-
-            * 
-            * 
-            * 
-            * /-
-             
-             
-             */
-
-        public static double Calculate(string therm)
+        public static double Calculate(string thermString)
         {
-            string b = therm;
-            List<string> thermList = new List<string>();
-            while(therm != "")
+            thermString = StrTools.ReplaceAll(thermString, "π", System.Math.PI.ToString(), "e", System.Math.E.ToString());
+            List<string> therm = ThermToArray(thermString);
+            return Calc(therm);
+        }
+
+        public static double Calc(List<string> therm)
+        {
+            while (therm.Contains("("))
             {
-                while (therm.StartsWith("("))
-                {
-                    thermList.Add(therm.Remove(1));
-                    therm = therm.Substring(1);
-                }
-
-                int min = System.Math.Min(therm.Contains('*') ? therm.IndexOf('*') : int.MaxValue, System.Math.Min(therm.Contains('/') ? therm.IndexOf('/') : int.MaxValue, System.Math.Min(therm.Contains('^') ? therm.IndexOf('^') : int.MaxValue, System.Math.Min(therm.Contains('√') ? therm.IndexOf('√') : int.MaxValue, System.Math.Min(therm.Contains('+') ? therm.Substring(1).IndexOf('+') + 1 : int.MaxValue, System.Math.Min(therm.Contains('-') ? therm.Substring(1).IndexOf('-') + 1 : int.MaxValue, therm.Contains(')') ? therm.IndexOf(')') : int.MaxValue))))));
-                if (min == int.MaxValue)
-                {
-                    thermList.Add(therm);
-                    break;
-                }
-                else
-                {
-                    thermList.Add(therm.Remove(min));
-                    therm = therm.Substring(min);
-                }
-
-                while (therm.StartsWith(")"))
-                {
-                    if (therm.Length == 1)
-                    {
-                        thermList.Add(therm);
-                        therm = "";
-                    }
-                    else
-                    {
-
-                        thermList.Add(therm.Remove(1));
-                        therm = therm.Substring(1);
-                    }
-                }
-                
-                if(therm != "")
-                {
-                    thermList.Add(therm.Remove(1));
-                    therm = therm.Substring(1);
-                }
-            }
-            therm = b;
-            therm = strTools.ReplaceAll(therm, "π", System.Math.PI.ToString(), "e", System.Math.E.ToString());
-            while (therm.Contains('('))
-            {
-                int openBracketIndex = therm.IndexOf('('), closedBracketIndex = GetClosedBracketIndexToFirstOpen(therm);
-                double bracketResult = Calculate(strTools.Section(therm, openBracketIndex + 1, closedBracketIndex - 1));
-                therm = strTools.Replace(therm, openBracketIndex, "F");
+                int openBracketIndex = therm.IndexOf("("), closedBracketIndex = GetClosedBracketIndexToFirstOpen(therm);
+                double bracketResult = Calc(therm.GetRange(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1));
+                therm = LstTools.Replace(therm, openBracketIndex, "F");
                 therm =
-                    therm.Contains("sinF") ? strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Sin(bracketResult).ToString()) :
-                    therm.Contains("cosF") ? strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Cos(bracketResult).ToString()) :
-                    therm.Contains("tanF") ? strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Tan(bracketResult).ToString()) :
-                    therm.Contains("logF") ? strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Log10(bracketResult).ToString()) :
-                    therm.Contains("lnF") ? strTools.Replace(therm, openBracketIndex - 2, closedBracketIndex, System.Math.Log(bracketResult).ToString()) :
-                    strTools.Replace(therm, openBracketIndex, closedBracketIndex, bracketResult.ToString());
+                    therm.Contains("sinF") ? LstTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Sin(bracketResult).ToString()) :
+                    therm.Contains("cosF") ? LstTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Cos(bracketResult).ToString()) :
+                    therm.Contains("tanF") ? LstTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Tan(bracketResult).ToString()) :
+                    therm.Contains("logF") ? LstTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Log10(bracketResult).ToString()) :
+                    therm.Contains("lnF") ?  LstTools.Replace(therm, openBracketIndex - 2, closedBracketIndex, System.Math.Log(bracketResult).ToString()) :
+                    LstTools.Replace(therm, openBracketIndex, closedBracketIndex, bracketResult.ToString());
             }
             return Operators(therm);
         }
 
-        static double Operators(string therm)
+        static double Operators(List<string> therm)
         {
             int index;
-            string reversedTherm = strTools.Reverse(therm);
-            double result =
-                (index = reversedTherm.IndexOf('+')) != -1 && strTools.AExistsAndInfrontOfB(reversedTherm, "+", "-") ? Operators(strTools.Reverse(reversedTherm.Substring(index + 1))) + Operators(strTools.Reverse(reversedTherm.Remove(index))) :
-                (index = reversedTherm.IndexOf('-')) != -1 ? Operators(strTools.Reverse(reversedTherm.Substring(index + 1))) - Operators(strTools.Reverse(reversedTherm.Remove(index))) :
-                (index = reversedTherm.IndexOf('*')) != -1 && strTools.AExistsAndInfrontOfB(reversedTherm, "*", "/") ? Operators(strTools.Reverse(reversedTherm.Substring(index + 1))) * Operators(strTools.Reverse(reversedTherm.Remove(index))) :
-                (index = reversedTherm.IndexOf('/')) != -1 ? Operators(strTools.Reverse(reversedTherm.Substring(index + 1))) / Operators(strTools.Reverse(reversedTherm.Remove(index))) :
-                (index = reversedTherm.IndexOf('^')) != -1 && strTools.AExistsAndInfrontOfB(reversedTherm, "^", "√") ? System.Math.Pow(Operators(strTools.Reverse(reversedTherm.Substring(index + 1))), Operators(strTools.Reverse(reversedTherm.Remove(index)))) :
-                (index = reversedTherm.IndexOf('√')) != -1 ? System.Math.Pow(Operators(strTools.Reverse(reversedTherm.Remove(index))), 1 / Operators(strTools.Reverse(reversedTherm.Substring(index + 1)))) :
-                (index = reversedTherm.IndexOf('!')) != -1 ? Factorial((ulong)Operators(strTools.Reverse(reversedTherm.Substring(index + 1)))) :
-                (index = reversedTherm.IndexOf('%')) != -1 ? Operators(strTools.Reverse(reversedTherm.Substring(index + 1))) / 100 :
-                (index = reversedTherm.IndexOf('E')) != -1 ? Operators(strTools.Reverse(reversedTherm.Substring(index + 1))) * System.Math.Pow(10, Operators(strTools.Reverse(reversedTherm.Remove(index)))) :
-                //therm == "" ? 0 :
+            List<string> reversedTherm = new List<string>(therm);
+            reversedTherm.Reverse();
+            return
+                (index = reversedTherm.IndexOf("+")) != -1 && LstTools.AExistsAndInfrontOfB(reversedTherm, "+", "-") ? Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))) + Operators(LstTools.Reverse(reversedTherm.GetRange(0, index))) :
+                (index = reversedTherm.IndexOf("-")) != -1 ? Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))) - Operators(LstTools.Reverse(reversedTherm.GetRange(0, index))) :
+                (index = reversedTherm.IndexOf("*")) != -1 && LstTools.AExistsAndInfrontOfB(reversedTherm, "*", "/") ? Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))) * Operators(LstTools.Reverse(reversedTherm.GetRange(0, index))) :
+                (index = reversedTherm.IndexOf("/")) != -1 ? Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))) / Operators(LstTools.Reverse(reversedTherm.GetRange(0, index))) :
+                (index = reversedTherm.IndexOf("^")) != -1 && LstTools.AExistsAndInfrontOfB(reversedTherm, "^", "√") ? System.Math.Pow(Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))), Operators(LstTools.Reverse(reversedTherm.GetRange(0, index)))) :
+                (index = reversedTherm.IndexOf("√")) != -1 ? System.Math.Pow(Operators(LstTools.Reverse(reversedTherm.GetRange(0, index))), 1 / Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1)))) :
+                (index = reversedTherm.IndexOf("!")) != -1 && LstTools.AExistsAndInfrontOfB(reversedTherm, "!", "%") ? Operators(LstTools.Reverse(LstTools.Replace(reversedTherm, index, index + 1, Factorial((ulong)Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1)))).ToString()))) :
+                (index = reversedTherm.IndexOf("%")) != -1 ? Operators(LstTools.Reverse(LstTools.Replace(reversedTherm, index, index + 1, (Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))) / 100).ToString()))) :
+                (index = reversedTherm.IndexOf("E")) != -1 ? Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))) * System.Math.Pow(10, Operators(LstTools.Reverse(reversedTherm.GetRange(0, index)))) :
+                double.Parse(therm.First());
                 //einheiten wie meter oder pi oder prozent können hier drangehangen werden
-                Convert.ToDouble(strTools.Reverse(reversedTherm));
-            return result;
+        }
+
+        static List<string> ThermToArray(string therm)
+        {
+            List<string> thermArray = new List<string>();
+            while (therm != "")
+            {
+                //openBracket
+                while (therm.StartsWith("("))
+                {
+                    thermArray.Add(therm.Remove(1));
+                    therm = therm.Substring(1);
+                }
+                
+                //number
+                int min = Min(
+                    therm.Contains('*') ? therm.IndexOf('*') : int.MaxValue, 
+                    therm.Contains('/') ? therm.IndexOf('/') : int.MaxValue, 
+                    therm.Contains('^') ? therm.IndexOf('^') : int.MaxValue, 
+                    therm.Contains('√') ? therm.IndexOf('√') : int.MaxValue, 
+                    therm.Substring(1).IndexOf('+') != -1 ? therm.Substring(1).IndexOf('+') + 1 : int.MaxValue, 
+                    therm.Substring(1).IndexOf('-') != -1 ? therm.Substring(1).IndexOf('-') + 1 : int.MaxValue, 
+                    therm.Contains(')') ? therm.IndexOf(')') : int.MaxValue, 
+                    therm.Contains('(') ? therm.IndexOf('(') : int.MaxValue, 
+                    therm.Contains('!') ? therm.IndexOf('!') : int.MaxValue,
+                    therm.Contains('%') ? therm.IndexOf('%') : int.MaxValue);
+                if (min == int.MaxValue)
+                {
+                    thermArray.Add(therm);
+                    therm = "";
+                }
+                else
+                {
+                    thermArray.Add(therm.Remove(min));
+                    therm = therm.Substring(min);
+                }
+
+                //fakultät/percent
+                while (therm.StartsWith("!") || therm.StartsWith("%"))
+                {
+                    if (therm.Length == 1)
+                    {
+                        thermArray.Add(therm);
+                        therm = "";
+                    }
+                    else
+                    {
+                        thermArray.Add(therm.Remove(1));
+                        therm = therm.Substring(1);
+                    }
+                }
+
+                //openBracket
+                while (therm.StartsWith(")"))
+                {
+                    if (therm.Length == 1)
+                    {
+                        thermArray.Add(therm);
+                        therm = "";
+                    }
+                    else
+                    {
+                        thermArray.Add(therm.Remove(1));
+                        therm = therm.Substring(1);
+                    }
+                }
+
+                //fakultät/percent
+                while (therm.StartsWith("!") || therm.StartsWith("%"))
+                {
+                    if (therm.Length == 1)
+                    {
+                        thermArray.Add(therm);
+                        therm = "";
+                    }
+                    else
+                    {
+                        thermArray.Add(therm.Remove(1));
+                        therm = therm.Substring(1);
+                    }
+                }
+
+                //operator
+                if (therm != "")
+                {
+                    thermArray.Add(therm.Remove(1));
+                    therm = therm.Substring(1);
+                }
+            }
+            return thermArray;
         }
 
         public static ulong Factorial(ulong n)
         {
             ulong result = 1;
-            for (ulong i = 1; i <= n; i++, result *= i) ;
+            for (ulong i = 2; i <= n; result *= i++) ;
             return result;
         }
 
-        static int GetClosedBracketIndexToFirstOpen(string therm)
+        public static int Min(params int[] d)
+        {
+            int min = int.MaxValue;
+            for (int i = 0; i < d.Length; i++)
+                min = System.Math.Min(min, d[i]);
+            return min;
+        }
+
+        static int GetClosedBracketIndexToFirstOpen(List<string> therm)
         {
             int closedBracketIndex = -1, i = 0;
             do
             {
-                if (strTools.AExistsAndInfrontOfB(therm, "(", ")"))
+                if (LstTools.AExistsAndInfrontOfB(therm, "(", ")"))
                 {
-                    therm = strTools.Replace(therm, therm.IndexOf('('), "[");
+                    therm = LstTools.Replace(therm, therm.IndexOf("("), "[");
                     i++;
                 }
                 else
                 {
-                    therm = strTools.Replace(therm, closedBracketIndex = therm.IndexOf(')'), "]");
+                    therm = LstTools.Replace(therm, closedBracketIndex = therm.IndexOf(")"), "]");
                     i--;
                 }
             } while (i != 0);
             return closedBracketIndex;
-        }
-    }
-
-    static class strTools
-    {
-        public static string Replace(string s, int index, string item)
-        {
-            return s.Remove(index, 1).Insert(index, item);
-        }
-
-        public static string Replace(string s, int startIndex, int endIndex, string item)
-        {
-            return s.Remove(startIndex, endIndex - startIndex + 1).Insert(startIndex, item);
-        }
-
-        public static string ReplaceAll(string s, params string[] items)
-        {
-            for (int i = 0; i < items.Length; i += 2)
-                s = s.Replace(items[i], items[i + 1]);
-            return s;
-        }
-
-        public static string RemoveSection(string s, int startIndex, int endIndex)
-        {
-            return s.Remove(startIndex, endIndex - startIndex + 1);
-        }
-
-        public static string Section(string s, int startIndex, int endIndex)
-        {
-            return s.Substring(startIndex, endIndex - startIndex + 1);
-        }
-
-        public static string Reverse(string s)
-        {
-            char[] charArray = s.ToCharArray();
-            Array.Reverse(charArray);
-            return new string(charArray);
-        }
-
-        public static bool AExistsAndInfrontOfB(string s, string a, string b)
-        {
-            return s.Contains(a) && (s.IndexOf(a) < s.IndexOf(b) || !s.Contains(b));
         }
     }
 }
