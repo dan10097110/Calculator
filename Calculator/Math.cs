@@ -30,8 +30,67 @@ namespace Calculator
             int index = 0;
             if((index = therm.IndexOf("E")) != -1)
                 therm = strTools.Replace(therm, index, "*10^");
-            this.therm = strTools.ReplaceAll(therm, "%", "/100", "π", System.Math.PI.ToString(), "e", System.Math.E.ToString());
-            Calculate();
+            //das wird oft wiederholt -> muss in Math calculation
+            //prozent wie operator behandeln
+            this.therm = strTools.ReplaceAll(therm, "π", System.Math.PI.ToString(), "e", System.Math.E.ToString());
+            therm = CalculateFunctions(therm);
+            result = Operators(therm);
+        }
+
+        double Operators(string therm)
+        {
+            int index;
+            string reversedTherm = strTools.Reverse(therm);
+            double result =
+                (index = reversedTherm.IndexOf('+')) != -1 && AInfrontOfB(reversedTherm, "+", "-") ? Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1))) + Math.Calculate(strTools.Reverse(reversedTherm.Remove(index))) :
+                (index = reversedTherm.IndexOf('-')) != -1 ? Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1))) - Math.Calculate(strTools.Reverse(reversedTherm.Remove(index))) :
+                (index = reversedTherm.IndexOf('*')) != -1 && AInfrontOfB(reversedTherm, "*", "/") ? Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1))) * Math.Calculate(strTools.Reverse(reversedTherm.Remove(index))) :
+                (index = reversedTherm.IndexOf('/')) != -1 ? Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1))) / Math.Calculate(strTools.Reverse(reversedTherm.Remove(index))) :
+                (index = reversedTherm.IndexOf('^')) != -1 && AInfrontOfB(reversedTherm, "^", "√") ? System.Math.Pow(Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1))), Math.Calculate(strTools.Reverse(reversedTherm.Remove(index)))) :
+                (index = reversedTherm.IndexOf('√')) != -1 ? System.Math.Pow(Math.Calculate(strTools.Reverse(reversedTherm.Remove(index))), 1 / Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1)))) :
+                (index = reversedTherm.IndexOf('!')) != -1 ? Math.Factorial((ulong)Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1)))) :
+                (index = reversedTherm.IndexOf('%')) != -1 ? Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1))) / 100 :
+                therm == "" ? 0 :
+                //einheiten wie meter oder pi oder prozent können hier drangehangen werden
+                Convert.ToDouble(strTools.Reverse(reversedTherm));
+            return result;
+        }
+
+        string CalculateFunctions(string therm)
+        {
+            while (therm.Contains('('))
+            {
+                int openBracketIndex = therm.IndexOf('('), closedBracketIndex = GetClosedBracketIndexToFirstOpen(therm);
+                double bracketResult = Math.Calculate(strTools.Section(therm, openBracketIndex + 1, closedBracketIndex - 1));
+                therm = strTools.Replace(therm, openBracketIndex, "F");
+                therm =
+                    therm.Contains("sinF") ? strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Sin(bracketResult).ToString()) :
+                    therm.Contains("cosF") ? strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Cos(bracketResult).ToString()) :
+                    therm.Contains("tanF") ? strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Tan(bracketResult).ToString()) :
+                    therm.Contains("logF") ? strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Log10(bracketResult).ToString()) :
+                    therm.Contains("lnF") ? strTools.Replace(therm, openBracketIndex - 2, closedBracketIndex, System.Math.Log(bracketResult).ToString()) :
+                    strTools.Replace(therm, openBracketIndex, closedBracketIndex, bracketResult.ToString());
+            }
+            return therm;
+        }
+
+        int GetClosedBracketIndexToFirstOpen(string therm)
+        {
+            int closedBracketIndex = -1, i = 0;
+            do
+            {
+                if (AInfrontOfB(therm, "(", ")"))
+                {
+                    therm = strTools.Replace(therm, therm.IndexOf('('), "[");
+                    i++;
+                }
+                else
+                {
+                    therm = strTools.Replace(therm, closedBracketIndex = therm.IndexOf(')'), "]");
+                    i--;
+                }
+            } while (i != 0);
+            return closedBracketIndex;
         }
 
         public double GetResult()
@@ -42,51 +101,6 @@ namespace Calculator
         bool AInfrontOfB(string s, string a, string b)
         {
             return s.Contains(a) && (s.IndexOf(a) < s.IndexOf(b) || !s.Contains(b));
-        }
-
-        void Calculate()
-        {
-            string reversedTherm = strTools.Reverse(CalculateFunctions(therm));
-            int index = 0;
-            result =
-                (index = reversedTherm.IndexOf('+')) != -1 && AInfrontOfB(reversedTherm, "+", "-") ? Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1))) + Math.Calculate(strTools.Reverse(reversedTherm.Remove(index))) :
-                (index = reversedTherm.IndexOf('-')) != -1 ? Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1))) - Math.Calculate(strTools.Reverse(reversedTherm.Remove(index))) :
-                (index = reversedTherm.IndexOf('*')) != -1 && AInfrontOfB(reversedTherm, "*", "/") ? Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1))) * Math.Calculate(strTools.Reverse(reversedTherm.Remove(index))) :
-                (index = reversedTherm.IndexOf('/')) != -1 ? Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1))) / Math.Calculate(strTools.Reverse(reversedTherm.Remove(index))) :
-                (index = reversedTherm.IndexOf('^')) != -1 && AInfrontOfB(reversedTherm, "^", "√") ? System.Math.Pow(Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1))), Math.Calculate(strTools.Reverse(reversedTherm.Remove(index)))) :
-                (index = reversedTherm.IndexOf('√')) != -1 ? System.Math.Pow(Math.Calculate(strTools.Reverse(reversedTherm.Remove(index))), 1 / Math.Calculate(strTools.Reverse(reversedTherm.Substring(index + 1)))) :
-                reversedTherm.Contains('!') ? Math.Factorial((ulong)Math.Calculate(strTools.Reverse(reversedTherm.Substring(reversedTherm.IndexOf('!') + 1)))):
-                therm == "" ? 0 :
-                Convert.ToDouble(strTools.Reverse(reversedTherm));
-        }
-
-        string CalculateFunctions(string therm)
-        {
-            while (therm.Contains('('))
-            {
-                int openBracketIndex = therm.IndexOf('('), closedBracketIndex = 0;
-                therm = strTools.Replace(therm, openBracketIndex, "F");
-                for(int i = 1; i != 0;)
-                    if (AInfrontOfB(therm, "(", ")"))
-                    {
-                        therm = strTools.Replace(therm, therm.IndexOf('('), "[");
-                        i++;
-                    }
-                    else
-                    {
-                        therm = strTools.Replace(therm, closedBracketIndex = therm.IndexOf(')'), "]");
-                        i--;
-                    }
-                double bracketResult = Math.Calculate(strTools.Section(therm = strTools.ReplaceAll(therm, "[", "(", "]", ")"), openBracketIndex + 1, closedBracketIndex - 1));
-                therm =
-                    therm.Contains("sinF") ? strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Sin(bracketResult).ToString()) :
-                    therm.Contains("cosF") ? strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Cos(bracketResult).ToString()) :
-                    therm.Contains("tanF") ? strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Tan(bracketResult).ToString()) :
-                    therm.Contains("logF") ? strTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Log10(bracketResult).ToString()) :
-                    therm.Contains("lnF") ? strTools.Replace(therm, openBracketIndex - 2, closedBracketIndex, System.Math.Log(bracketResult).ToString()) :
-                    strTools.Replace(therm, openBracketIndex, closedBracketIndex, bracketResult.ToString());
-            }
-            return therm;
         }
     }
 
