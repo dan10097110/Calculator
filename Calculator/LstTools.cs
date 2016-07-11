@@ -35,5 +35,15 @@ namespace Calculator
             newList.Reverse();
             return newList;
         }
+
+        public static List<string> GetOver(List<string> list, int index)
+        {
+            return list.GetRange(index + 1, list.Count - index - 1);
+        }
+
+        public static List<string> GetUnder(List<string> list, int index)
+        {
+            return list.GetRange(0, index);
+        }
     }
 }

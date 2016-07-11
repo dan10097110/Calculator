@@ -7,22 +7,17 @@ namespace Calculator
 {
     static class Math
     {
-        //fakultät und prozent im direkten zusammenspiel funktionieren nicht
-
-
         public static double Calculate(string thermString)
         {
-            thermString = StrTools.ReplaceAll(thermString, "π", System.Math.PI.ToString(), "e", System.Math.E.ToString());
-            List<string> therm = ThermToArray(thermString);
-            return Calc(therm);
+            return Brackets(ThermToArray(StrTools.ReplaceAll(thermString, "π", System.Math.PI.ToString(), "e", System.Math.E.ToString())));
         }
 
-        public static double Calc(List<string> therm)
+        static double Brackets(List<string> therm)
         {
             while (therm.Contains("("))
             {
                 int openBracketIndex = therm.IndexOf("("), closedBracketIndex = GetClosedBracketIndexToFirstOpen(therm);
-                double bracketResult = Calc(therm.GetRange(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1));
+                double bracketResult = Brackets(therm.GetRange(openBracketIndex + 1, closedBracketIndex - openBracketIndex - 1));
                 therm = LstTools.Replace(therm, openBracketIndex, "F");
                 therm =
                     therm.Contains("sinF") ? LstTools.Replace(therm, openBracketIndex - 3, closedBracketIndex, System.Math.Sin(bracketResult).ToString()) :
@@ -41,15 +36,15 @@ namespace Calculator
             List<string> reversedTherm = new List<string>(therm);
             reversedTherm.Reverse();
             return
-                (index = reversedTherm.IndexOf("+")) != -1 && LstTools.AExistsAndInfrontOfB(reversedTherm, "+", "-") ? Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))) + Operators(LstTools.Reverse(reversedTherm.GetRange(0, index))) :
-                (index = reversedTherm.IndexOf("-")) != -1 ? Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))) - Operators(LstTools.Reverse(reversedTherm.GetRange(0, index))) :
-                (index = reversedTherm.IndexOf("*")) != -1 && LstTools.AExistsAndInfrontOfB(reversedTherm, "*", "/") ? Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))) * Operators(LstTools.Reverse(reversedTherm.GetRange(0, index))) :
-                (index = reversedTherm.IndexOf("/")) != -1 ? Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))) / Operators(LstTools.Reverse(reversedTherm.GetRange(0, index))) :
-                (index = reversedTherm.IndexOf("^")) != -1 && LstTools.AExistsAndInfrontOfB(reversedTherm, "^", "√") ? System.Math.Pow(Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))), Operators(LstTools.Reverse(reversedTherm.GetRange(0, index)))) :
-                (index = reversedTherm.IndexOf("√")) != -1 ? System.Math.Pow(Operators(LstTools.Reverse(reversedTherm.GetRange(0, index))), 1 / Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1)))) :
-                (index = reversedTherm.IndexOf("!")) != -1 && LstTools.AExistsAndInfrontOfB(reversedTherm, "!", "%") ? Operators(LstTools.Reverse(LstTools.Replace(reversedTherm, index, index + 1, Factorial((ulong)Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1)))).ToString()))) :
-                (index = reversedTherm.IndexOf("%")) != -1 ? Operators(LstTools.Reverse(LstTools.Replace(reversedTherm, index, index + 1, (Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))) / 100).ToString()))) :
-                (index = reversedTherm.IndexOf("E")) != -1 ? Operators(LstTools.Reverse(reversedTherm.GetRange(index + 1, reversedTherm.Count - index - 1))) * System.Math.Pow(10, Operators(LstTools.Reverse(reversedTherm.GetRange(0, index)))) :
+                (index = reversedTherm.IndexOf("+")) != -1 && LstTools.AExistsAndInfrontOfB(reversedTherm, "+", "-")    ? Operators(LstTools.Reverse(LstTools.GetOver(reversedTherm, index))) + Operators(LstTools.Reverse(LstTools.GetUnder(reversedTherm, index))) :
+                (index = reversedTherm.IndexOf("-")) != -1                                                              ? Operators(LstTools.Reverse(LstTools.GetOver(reversedTherm, index))) - Operators(LstTools.Reverse(LstTools.GetUnder(reversedTherm, index))) :
+                (index = reversedTherm.IndexOf("*")) != -1 && LstTools.AExistsAndInfrontOfB(reversedTherm, "*", "/")    ? Operators(LstTools.Reverse(LstTools.GetOver(reversedTherm, index))) * Operators(LstTools.Reverse(LstTools.GetUnder(reversedTherm, index))) :
+                (index = reversedTherm.IndexOf("/")) != -1                                                              ? Operators(LstTools.Reverse(LstTools.GetOver(reversedTherm, index))) / Operators(LstTools.Reverse(LstTools.GetUnder(reversedTherm, index))) :
+                (index = reversedTherm.IndexOf("^")) != -1 && LstTools.AExistsAndInfrontOfB(reversedTherm, "^", "√")    ? System.Math.Pow(Operators(LstTools.Reverse(LstTools.GetOver(reversedTherm, index))), Operators(LstTools.Reverse(LstTools.GetUnder(reversedTherm, index)))) :
+                (index = reversedTherm.IndexOf("√")) != -1                                                              ? System.Math.Pow(Operators(LstTools.Reverse(LstTools.GetUnder(reversedTherm, index))), 1 / Operators(LstTools.Reverse(LstTools.GetOver(reversedTherm, index)))) :
+                (index = reversedTherm.IndexOf("!")) != -1 && LstTools.AExistsAndInfrontOfB(reversedTherm, "!", "%")    ? Operators(LstTools.Reverse(LstTools.Replace(reversedTherm, index, reversedTherm.Count - 1, Factorial((ulong)Operators(LstTools.Reverse(LstTools.GetOver(reversedTherm, index)))).ToString()))) :
+                (index = reversedTherm.IndexOf("%")) != -1                                                              ? Operators(LstTools.Reverse(LstTools.Replace(reversedTherm, index, reversedTherm.Count - 1, (Operators(LstTools.Reverse(LstTools.GetOver(reversedTherm, index))) / 100).ToString()))) :
+                (index = reversedTherm.IndexOf("E")) != -1                                                              ? Operators(LstTools.Reverse(LstTools.GetOver(reversedTherm, index))) * System.Math.Pow(10, Operators(LstTools.Reverse(LstTools.GetUnder(reversedTherm, index)))) :
                 double.Parse(therm.First());
                 //einheiten wie meter oder pi oder prozent können hier drangehangen werden
         }
@@ -65,7 +60,6 @@ namespace Calculator
                     thermArray.Add(therm.Remove(1));
                     therm = therm.Substring(1);
                 }
-                
                 //number
                 int min = Min(
                     therm.Contains('*') ? therm.IndexOf('*') : int.MaxValue, 
@@ -88,7 +82,6 @@ namespace Calculator
                     thermArray.Add(therm.Remove(min));
                     therm = therm.Substring(min);
                 }
-
                 //fakultät/percent
                 while (therm.StartsWith("!") || therm.StartsWith("%"))
                 {
@@ -103,7 +96,6 @@ namespace Calculator
                         therm = therm.Substring(1);
                     }
                 }
-
                 //openBracket
                 while (therm.StartsWith(")"))
                 {
@@ -118,7 +110,6 @@ namespace Calculator
                         therm = therm.Substring(1);
                     }
                 }
-
                 //fakultät/percent
                 while (therm.StartsWith("!") || therm.StartsWith("%"))
                 {
@@ -132,8 +123,7 @@ namespace Calculator
                         thermArray.Add(therm.Remove(1));
                         therm = therm.Substring(1);
                     }
-                }
-
+                } 
                 //operator
                 if (therm != "")
                 {

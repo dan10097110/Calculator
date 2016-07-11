@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Calculator"
         mc:Ignorable="d"
-        Title="Calculator" Height="257" Width="432" ResizeMode="NoResize">
+        Title="Calculator" Height="257" Width="432" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid>
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="395" FontSize="18" Height="26" Text="log zur basis x"/>
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="395" FontSize="18" Height="26"/>
         <TextBox x:Name="textBox1" HorizontalAlignment="Left" Margin="10,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="395" FontSize="18" IsReadOnly="True" Height="26"/>
         <Button x:Name="buttonSieben" Content="7" HorizontalAlignment="Left" Margin="160,72,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonSieben_Click"/>
         <Button x:Name="buttonFakultät" Content="x!" HorizontalAlignment="Left" Margin="60,107,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonFakultät_Click"/>
