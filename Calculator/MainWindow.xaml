@@ -14,7 +14,7 @@
         <Button x:Name="buttonGleich" Content="=" HorizontalAlignment="Left" Margin="260,177,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonGleich_Click"/>
         <Button x:Name="buttonPlus" Content="+" HorizontalAlignment="Left" Margin="310,177,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonPlus_Click"/>
         <Button x:Name="buttonOffeneKlammer" Content="(" HorizontalAlignment="Left" Margin="60,72,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonOffeneKlammer_Click"/>
-        <Button x:Name="buttonNatürlicherLogarithmus" Content="ln" HorizontalAlignment="Left" Margin="110,142,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonNatürlicherLogarithmus_Click"/>
+        <Button x:Name="buttonNatürlicherLogarithmus" Content="Ln" HorizontalAlignment="Left" Margin="110,142,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonNatürlicherLogarithmus_Click"/>
         <Button x:Name="buttonClearElement" Content="CE" HorizontalAlignment="Left" Margin="310,72,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonClearElement_Click"/>
         <Button x:Name="buttonMinus" Content="-" HorizontalAlignment="Left" Margin="360,177,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonMinus_Click"/>
         <Button x:Name="buttonDrei" Content="3" HorizontalAlignment="Left" Margin="260,142,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonDrei_Click"/>
@@ -30,7 +30,7 @@
         <Button x:Name="buttonAllClear" Content="AC" HorizontalAlignment="Left" Margin="360,72,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonAllClear_Click"/>
         <Button x:Name="buttonNull" Content="0" HorizontalAlignment="Left" Margin="160,177,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonNull_Click"/>
         <Button x:Name="buttonKomma" Content="," HorizontalAlignment="Left" Margin="210,177,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonKomma_Click"/>
-        <Button x:Name="buttonLogarithmus" Content="log" HorizontalAlignment="Left" Margin="60,142,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonLogarithmus_Click"/>
+        <Button x:Name="buttonLogarithmus" Content="Log" HorizontalAlignment="Left" Margin="60,142,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonLogarithmus_Click"/>
         <Button x:Name="buttonWurzel" Content="√" HorizontalAlignment="Left" Margin="360,107,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonWurzel_Click"/>
         <Button x:Name="buttonHoch" Content="^" HorizontalAlignment="Left" Margin="310,107,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonHoch_Click"/>
         <Button x:Name="buttonGeschlosseneKlammer" Content=")" HorizontalAlignment="Left" Margin="110,72,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonGeschlosseneKlammer_Click"/>
@@ -38,9 +38,9 @@
         <Button x:Name="buttonE" Content="e" HorizontalAlignment="Left" Margin="110,177,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonE_Click"/>
         <Button x:Name="buttonProzent" Content="%" HorizontalAlignment="Left" Margin="110,107,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonProzent_Click"/>
         <Button x:Name="buttonLastAnswer" Content="Ans" HorizontalAlignment="Left" Margin="10,177,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonLastAnswer_Click"/>
-        <Button x:Name="buttonTangens" Content="tan" HorizontalAlignment="Left" Margin="10,142,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonTangens_Click"/>
-        <Button x:Name="buttonCosinus" Content="cos" HorizontalAlignment="Left" Margin="10,107,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonCosinus_Click"/>
-        <Button x:Name="buttonSinus" Content="sin" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonSinus_Click"/>
+        <Button x:Name="buttonTangens" Content="Tan" HorizontalAlignment="Left" Margin="10,142,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonTangens_Click"/>
+        <Button x:Name="buttonCosinus" Content="Cos" HorizontalAlignment="Left" Margin="10,107,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonCosinus_Click"/>
+        <Button x:Name="buttonSinus" Content="Sin" HorizontalAlignment="Left" Margin="10,72,0,0" VerticalAlignment="Top" Width="45" Height="30" FontSize="16" Click="buttonSinus_Click"/>
 
     </Grid>
 </Window>

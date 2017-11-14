@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows;
+using DLib;
 
 namespace Calculator
 {
@@ -46,17 +34,17 @@ namespace Calculator
 
         private void buttonSinus_Click(object sender, RoutedEventArgs e)
         {
-            Write("sin()", 4);
+            Write("Sin()", 4);
         }
 
         private void buttonTangens_Click(object sender, RoutedEventArgs e)
         {
-            Write("tan()", 4);
+            Write("Tan()", 4);
         }
 
         private void buttonCosinus_Click(object sender, RoutedEventArgs e)
         {
-            Write("cos()", 4);
+            Write("Cos()", 4);
         }
 
         private void buttonLastAnswer_Click(object sender, RoutedEventArgs e)
@@ -76,7 +64,7 @@ namespace Calculator
 
         private void buttonLogarithmus_Click(object sender, RoutedEventArgs e)
         {
-            Write("log()", 4);
+            Write("Log()", 4);
         }
 
         private void buttonPi_Click(object sender, RoutedEventArgs e)
@@ -96,7 +84,7 @@ namespace Calculator
 
         private void buttonNatürlicherLogarithmus_Click(object sender, RoutedEventArgs e)
         {
-            Write("ln()", 3);
+            Write("Ln()", 3);
         }
 
         private void buttonE_Click(object sender, RoutedEventArgs e)
@@ -161,7 +149,7 @@ namespace Calculator
 
         private void buttonGleich_Click(object sender, RoutedEventArgs e)
         {
-            double ergebnis = Math.Calculate(textBox.Text);
+            double ergebnis = DLib.Math.Calculator.Solve(textBox.Text);
             textBox1.Text = ergebnis.ToString();
             lastAnswer = ergebnis;
         }
